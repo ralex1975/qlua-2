@@ -46,15 +46,15 @@ function Gapper.addQuote(bid, ask)
     -- Decide sell or buy
 	assert(type(bid) == "number", "addQuote expects bid as a number")
 	assert(type(ask) == "number", "addQuote expects ask as a number")
-	
+
 	assert(maxGap    > 0, "maxGap not set")
 	assert(margin    > 0, "margin not set")
 	assert(brokerFee > 0, "brokerFee not set")
-	
+
 	res = 0
 	if buyPrice == 0 and lastAsk > ask + maxGap then
 		res = 1
-		buyPrice = ask		
+		buyPrice = ask
 	elseif buyPrice > 0 and bid >= buyPrice + brokerFee * 2 + margin then
 		res = -1
 		buyPrice = 0

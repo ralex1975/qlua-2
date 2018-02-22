@@ -10,8 +10,9 @@ LAST_ASK = 0
 LAST_BID = 0
 SCALE = 100
 
-
-
+local d = os.date("%d_%m_%y")
+local fname = "DATA_"..p_seccode..d..".txt"
+local fpath = "C:\\tmp\\qlua\\data\\"
 
 --------------------------------
 --  MAIN
@@ -54,7 +55,7 @@ function OnQuote(class_code, sec_code)
 		end
 		LAST_BID = max_bid
 		LAST_ASK = min_ask
-		l_file=io.open("C:\\tmp\\sber_data3.txt", "a")
+		l_file=io.open(fpath..fname, "a")
 		l_file:write(os.date("%c ")..
 					 tostring(LAST_BID).." "..
 					 tostring(LAST_ASK).."\n")

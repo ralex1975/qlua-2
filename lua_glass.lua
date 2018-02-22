@@ -1,15 +1,14 @@
 
 p_classcode="TQBR" --Код класса
 
-p_seccode="MTSS" --Код инструмента
+p_seccode="SBER" --Код инструмента
 
-p_my_price = 301.85
+p_my_price = 264.98
 
 p_my_newprice = p_my_price * 1.01
 
 is_run=true
 
-LAST_BID = 0
 
 
 
