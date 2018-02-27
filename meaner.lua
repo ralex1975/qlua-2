@@ -1,3 +1,4 @@
+local L = require "list"
 
 
 local Meaner = {}
@@ -8,6 +9,11 @@ local lastAsk     = 0
 local buyPrice    = 0
 local brokerFee   = 0
 local totalIncome = 0
+local quoteList   = {}
+
+function Meaner.init(size)
+	quoteList = L.new(size)
+end
 
 function Meaner.reset()
 	margin      = 0
@@ -16,6 +22,7 @@ function Meaner.reset()
 	buyPrice    = 0
 	brokerFee   = 0
 	totalIncome = 0
+	quoteList   = {}
 end
 
 function Meaner.setMargin(mar)

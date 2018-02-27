@@ -1,72 +1,9 @@
-List = {}
 
-function List.new ()
-   return {first = 0, last = -1}
-end
+local Q = require "quikutil"
 
-function List.pushright (list, value)
-  local last = list.last + 1
-  list.last = last
-  list[last] = value
-end   
 
-function List.popleft (list)
-   local first = list.first
-   if first > list.last then error("list is empty") end
-   local value = list[first]
-   list[first] = nil        -- to allow garbage collection
-   list.first = first + 1
-   return value
-end
 
-function List.mean(list)
-  local sum = 0
-  local count= 0
 
-  for i = list[list.first], list[list.last], 1 do
-	local v = list[i]
-    if type(v) == 'number' then
-      sum = sum + v
-      count = count + 1
-	  message("  v: "..tostring(v), 1)
-    end
-  end
-
-  return (sum / count)
-end
-
--- Table to hold statistical functions
-stats={}
-
--- Get the mean value of a table
-function stats.mean( t )
-  local sum = 0
-  local count= 0
-
-  for k,v in pairs(t) do
-    if type(v) == 'number' and k ~= 'first' and k ~= 'last' then
-      sum = sum + v
-      count = count + 1
-    end
-  end
-
-  return (sum / count)
-end
-
--- Get the max and min for a table
-function stats.maxmin( t )
-  local max = -math.huge
-  local min = math.huge
-
-  for k,v in pairs( t ) do
-    if type(v) == 'number' then
-      max = math.max( max, v )
-      min = math.min( min, v )
-    end
-  end
-
-  return max, min
-end
 
 p_classcode="TQBR" --Код класса
 
@@ -135,21 +72,7 @@ function OnQuote(class_code, sec_code)
 
     if class_code == p_classcode and sec_code == p_seccode then
 		
-		local tb = getQuoteLevel2(class_code, sec_code)
-			--message(class_code.."   "..sec_code.."  bid_count: "..tostring(tb.bid_count),1)
-			--p = tb.bid[tb.bid_count].price
-		local bid_size = tonumber(tb.bid_count)
-		local offer_size = tonumber(tb.offer_count)
-		local max_bid = -math.huge
-		for i= 1, tb.bid_count, 1 do
-			local p = tonumber(tb.bid[i].price)
-			max_bid = math.max( max_bid, p )
-		end
-		local min_ask = math.huge
-		for i= 1, tb.offer_count, 1 do
-			local p = tonumber(tb.offer[i].price)
-			min_ask = math.min( min_ask, p )
-		end
+
 		if LAST_BID == max_bid and LAST_ASK == min_ask then
 			--message(class_code.."   "..sec_code.."  SKIP ",1)
 			SKIP_QUOTE_NUM = SKIP_QUOTE_NUM + 1
