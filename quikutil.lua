@@ -1,5 +1,33 @@
 local Quik = {}
 
+--DIGITS = 2
+--SHIFT = 10 ^ DIGITS
+
+function Quik.isValidQuote(bid, ask)
+    local res = false
+    if type(bid) == "number" and type(ask) == "number" and bid < ask then
+        res = true
+    end
+    return res
+end
+
+function Quik.canBuy(price)
+    local res = false
+    local tname = 'money_limits'
+    local num = getNumberOf(tname)
+    for i = 0, num - 1, 1 do
+        t = getItem(tname, i)
+        if t ~= nil then
+            local l = t.currentbal
+            if l > price then
+                res = true
+                break
+            end
+        end
+    end
+    return res
+end
+
 function Quik.getBidAsk(class_code, sec_code)
     local tb = getQuoteLevel2(class_code, sec_code)
     local min_ask = math.huge
