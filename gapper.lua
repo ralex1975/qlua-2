@@ -23,7 +23,7 @@ end
 function Gapper.setMargin(mar)
 	assert(type(mar) == "number", "setMargin expects margin as a number")
 	assert(mar > 0, "setMargin expects positive margin")
-	margin = mar
+	margin = 1 + mar/100
 end
 
 function Gapper.setBrokerFee(fee)
@@ -51,14 +51,19 @@ function Gapper.addQuote(bid, ask)
 	assert(margin    > 0, "margin not set")
 	assert(brokerFee > 0, "brokerFee not set")
 
-	res = 0
-	if buyPrice == 0 and lastAsk > ask + maxGap then
-		res = 1
-		buyPrice = ask
-	elseif buyPrice > 0 and bid >= buyPrice + brokerFee * 2 + margin then
-		res = -1
-		buyPrice = 0
-		totalIncome = totalIncome + (bid - buyPrice - brokerFee * 2)
+	local res = 0
+	if buyPrice == 0 then
+		if lastAsk > ask + maxGap then
+			--print("got gap: "..bid.." "..ask)
+			res = 1
+			buyPrice = ask
+		end
+	else
+		if bid >= (buyPrice * margin) then
+			res = -1
+			totalIncome = totalIncome + (bid - buyPrice - brokerFee * 2)
+			buyPrice = 0
+		end
 	end
 	lastBid = bid
 	lastAsk = ask

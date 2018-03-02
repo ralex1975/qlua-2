@@ -1,25 +1,24 @@
 local Q = require "quikutil"
-
+local gapper = require "gapper"
 
 p_classcode="TQBR" --Код класса
 
 p_seccode="SBER" --Код инструмента
 
-
 is_run=true
 
-LAST_ASK = 0
-
-LAST_PRICE = 281.86
 AMOUNT = 1
 
-BROKER_FEE = 0.25 * 2
+BROKER_FEE = 0.25
 
-INCOME = 0
-
-GAP = 0.2
+GAP = 0.22
 LOT = 10
-MARGIN = 1.01
+MARGIN = 1.3 --percent
+
+gapper.reset()
+gapper.setMargin(MARGIN)
+gapper.setMaxGap(GAP)
+gapper.setBrokerFee(BROKER_FEE)
 
 function main()
     local cntr = 0
@@ -34,9 +33,9 @@ end
 
 
 function OnStop(stop_flag)
-
       is_run=false
-
+      local inc = gapper.getTotalIncome()
+      message("Total income: "..inc, 1)
 end
 
 function OnTrade(trade)
@@ -56,32 +55,24 @@ function OnQuote(class_code, sec_code)
 		return
 	end
     if class_code == p_classcode and sec_code == p_seccode then
+        local res = 0
         bid, ask = Q.getBidAsk(class_code, sec_code)
         if Q.isValidQuote(bid, ask) ~= true then
             message("Bad quote: "..bid.." "..ask, 1)
             return                                                      --RETURN
         end
-        if LAST_PRICE == 0 then -- Buy here
-            if  ask <= (LAST_ASK - 0.1) then
-                message("Gap " .. LAST_ASK - ask, 1)
+        local rc = gapper.addQuote(bid, ask)
+        if rc == 1 then
+            if Q.canBuy(ask) then
+            --res = Q.buy(p_seccode, ask, AMOUNT)
             end
-            if  ask <= (LAST_ASK - GAP) and Q.canBuy(ask) == true then
-                res = Q.buy(p_seccode, ask, 1)
-				message(res, 1)
-                LAST_PRICE = ask
-            end
-            LAST_ASK = ask
-        else -- Sell here
-            if bid >= (LAST_PRICE * MARGIN) then
-                res = Q.sell(p_seccode, bid, AMOUNT)
-                LAST_PRICE = 0
-                INCOME = INCOME + (price - LAST_PRICE - BROKER_FEE) * LOT
-                message(res, 1)
-                is_run = false                                            --STOP
-            end
-        
+            message("Bought "..ask, 1)
+        elseif rc == -1 then
+            --res = Q.sell(p_seccode, bid, AMOUNT)
+            message("Sold "..bid, 1)
+            local inc = gapper.getTotalIncome()
+            message("Total income: "..inc, 1)
         end
 	end
-
 end
 
