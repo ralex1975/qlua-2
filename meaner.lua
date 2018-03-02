@@ -9,10 +9,12 @@ local lastAsk     = 0
 local buyPrice    = 0
 local brokerFee   = 0
 local totalIncome = 0
-local quoteList   = {}
+local askList   = {}
+local bidList   = {}
 
-function Meaner.init(size)
-	quoteList = L.new(size)
+function Meaner.init(bid_size, ask_size)
+	bidList = L.new(bid_size)
+    askList = L.new(ask_size)
 end
 
 function Meaner.reset()
@@ -47,21 +49,29 @@ function Meaner.addQuote(bid, ask)
 	assert(type(bid) == "number", "addQuote expects bid as a number")
 	assert(type(ask) == "number", "addQuote expects ask as a number")
 	
-	assert(maxGap    > 0, "maxGap not set")
 	assert(margin    > 0, "margin not set")
 	assert(brokerFee > 0, "brokerFee not set")
+	assert(next(bidList) ~= nil, "empty bid list")
+	assert(next(askList) ~= nil, "empty ask list")
 	
-	res = 0
-	if buyPrice == 0 and lastAsk > ask + maxGap then
+	local res = 0
+	if buyPrice == 0 and waitPrice == false then
+		if List.isfull(askList) then
+		waitPrice = true
+	else
+		local m = List.mean(askList)
+		if ask < 
 		res = 1
 		buyPrice = ask		
-	elseif buyPrice > 0 and bid >= buyPrice + brokerFee * 2 + margin then
+	elseif buyPrice > 0 and List.isfull(bidList) then
 		res = -1
 		buyPrice = 0
 		totalIncome = totalIncome + (bid - buyPrice - brokerFee * 2)
 	end
 	lastBid = bid
 	lastAsk = ask
+	List.pushright(bidList, bid)
+	List.pushright(askList, ask)
 	return res
 end
 

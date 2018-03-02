@@ -6,6 +6,10 @@ function List.new(size)
   return {first = 0, last = -1, max_size = size}
 end
 
+function List.isfull(list)
+  return (list.last + 1 - list.first) == list.max_size
+end
+
 function List.pushright (list, value)
   local last = list.last + 1
   list.last = last
