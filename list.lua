@@ -12,11 +12,14 @@ end
 
 function List.pushright (list, value)
   local last = list.last + 1
+  if last == list.max_size then
+     List.popleft(list)
+     last = last - 1
+     list.first = list.first - 1
+  end
   list.last = last
   list[last] = value
-  if list.last == list.max_size then
-    List.popleft(list)
-  end
+
 end   
 
 function List.popleft (list)
@@ -39,6 +42,12 @@ function List.mean(list)
   end
   if count == 0 then count = count + 1 end
   return (sum / count)
+end
+
+function List.dump(list)
+  for k, v in pairs(list) do
+    print(k.." "..v)
+  end
 end
 
 return List

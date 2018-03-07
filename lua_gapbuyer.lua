@@ -3,7 +3,9 @@ local gapper = require "gapper"
 
 p_classcode="TQBR" --Код класса
 
-p_seccode="SBER" --Код инструмента
+--p_seccode="SBER" --Код инструмента
+p_seccode="VTBR" --Код инструмента
+
 
 is_run=true
 
@@ -11,7 +13,7 @@ AMOUNT = 1
 
 BROKER_FEE = 0.25
 
-GAP = 0.22
+GAP = 0.00024
 LOT = 10
 MARGIN = 1.3 --percent
 
@@ -58,20 +60,20 @@ function OnQuote(class_code, sec_code)
         local res = 0
         bid, ask = Q.getBidAsk(class_code, sec_code)
         if Q.isValidQuote(bid, ask) ~= true then
-            message("Bad quote: "..bid.." "..ask, 1)
+            --message("Bad quote: "..bid.." "..ask, 1)
             return                                                      --RETURN
         end
         local rc = gapper.addQuote(bid, ask)
         if rc == 1 then
             if Q.canBuy(ask) then
-            --res = Q.buy(p_seccode, ask, AMOUNT)
+            res = Q.buy(p_seccode, ask, AMOUNT)
             end
             message("Bought "..ask, 1)
         elseif rc == -1 then
-            --res = Q.sell(p_seccode, bid, AMOUNT)
+            res = Q.sell(p_seccode, bid, AMOUNT)
             message("Sold "..bid, 1)
             local inc = gapper.getTotalIncome()
-            message("Total income: "..inc, 1)
+            message("Total income: "..inc * LOT, 1)
         end
 	end
 end

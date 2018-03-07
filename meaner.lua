@@ -80,9 +80,11 @@ function Meaner.addQuote(bid, ask)
 	local askMean = L.mean(askList)
 	local bidMean = L.mean(bidList)
 
+	--print("buyPrice "..buyPrice.." bid_full: "..tostring(L.isfull(bidList)).." bidMean: "..bidMean.." askMean: "..askMean)
+
 	local res = 0
 	if buyPrice == 0 and waitPrice == false then
-		if isAskReady then
+		if isAskReady and askMean < lastAskMean then
 			waitPrice = true
 			print("waiting price")
 		end
@@ -93,15 +95,19 @@ function Meaner.addQuote(bid, ask)
 				waitPrice = false
 				res = 1
 				print("Quote: "..quoteCounter.." buy for "..buyPrice)
+				print("want sell for "..buyPrice * margin)
 			end
 		end
 	elseif buyPrice > 0 and L.isfull(bidList) == true then
+		--print("DBG sell: bid="..bid.." lastBid="..lastBid.." bidMean="..bidMean.." lastBidMean="..lastBidMean)
 		if bid > maxSell then
 			maxSell = bid
 			print("max sell "..bid)
 		end
+
 		if bid <= lastBid then
 			if bidMean < lastBidMean then
+				--print("want sell for "..buyPrice * margin)
 				if bid >= buyPrice * margin then
 					res = -1
 					totalIncome = totalIncome + (bid - buyPrice - brokerFee * 2)

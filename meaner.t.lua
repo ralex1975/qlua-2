@@ -1,7 +1,9 @@
 
 local meaner = require "meaner"
+local stat   = require "statgainer"
 
-local DATA_FILE = "./data/DATA_SBER27_02_18.txt"
+local DATA_FILE = "./data/DATA_MEANER_T.txt"
+local LIST_SIZE = 3
 --local DATA_FILE = "./data/DATA_SBER16_02_18.txt"
 --local lines = {}
 
@@ -18,39 +20,48 @@ end
 
 -- get all lines from a file, returns an empty 
 -- list/table if the file does not exist
-function main(file, margin)
-  if not file_exists(file) then return {} end
+function main()
+  if not file_exists(DATA_FILE) then return {} end
   meaner.reset()
-  meaner.init(50, 50)
-  meaner.setMargin(margin)
-  meaner.setBrokerFee(25)
+  meaner.init(LIST_SIZE, LIST_SIZE)
+  meaner.setMargin(0.1)
+  meaner.setBrokerFee(1)
   --lines = {}
   local counter = 0
-  for line in io.lines(file) do 
+  for line in io.lines(DATA_FILE) do
+    bid, ask = parse_line(line)
+
+    assert(bid ~= nil,    "Valid bid")
+    assert(ask ~= nil,    "Valid ask")
+
     counter = counter + 1
     --lines[#lines + 1] = line
-    run(margin, line)
-    if counter == 5000 then return end
+    local rc = meaner.addQuote(bid, ask)
+    if     counter <= LIST_SIZE then assert(rc == 0, "skip")
+    --elseif counter == 1 then
+    end
+    --if counter == 5000 then return end
 
   end
   income = meaner.getTotalIncome()
-  if income > 0 then
-     print("Gap: "..gap.." Margin:"..margin.." Total income: "..income)
-  end
+  assert(income == 1, "Total income")
+
   --return lines
 end
 
-function run(margin, line)
+function parse_line(line)
    --for key,value in pairs(lines) do
        a,b,c,d = string.match(line, '(.*) (.*) (%d+) (%d+)')
-       bid = tonumber(c)
-       ask = tonumber(d)
-       --print(bid..ask.."\n")
+       local bid = tonumber(c)
+       local ask = tonumber(d)
+       print(bid.." "..ask.."\n")
        if bid ~= nil and ask ~= nil and bid < ask then
-          rc = meaner.addQuote(bid, ask)
-          if rc ~= 0 then
-            print("quote: "..line.." op: "..rc)
-          end
+          return bid, ask
+          --rc = meaner.addQuote(bid, ask)
+          --stat.addQuote(bid, ask)
+          -- if rc ~= 0 then
+          --   print("quote: "..line.." op: "..rc)
+          -- end
        end
    --end
 
@@ -60,11 +71,4 @@ end
 -- end
 --lines = lines_from(DATA_FILE)
 
-
-
--- for g=20,20 do
---    for m=10,10 do
---       run(g, m/10, lines)
---    end
--- end
-main(DATA_FILE, 0.1)
+main()
